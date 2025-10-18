@@ -7,38 +7,30 @@ import wave
 from pydub import AudioSegment
 import audioop
 import math
+import numpy as np
 
 
 def get_emoji_from_decibel(file_path):
-    """
-    Calculate decibel level (dBFS) correctly and map to emoji.
-    """
     try:
         audio = AudioSegment.from_file(file_path)
         audio = audio.set_channels(1).set_frame_rate(44100)
-        raw_data = audio.raw_data
-        rms = audioop.rms(raw_data, audio.sample_width)
-
-        # Correct normalization: reference value depends on sample width
-        max_possible_amplitude = float(1 << (8 * audio.sample_width - 1))
-        db_level = 20 * math.log10(rms / max_possible_amplitude) if rms > 0 else -90
-        print(f"Calculated dB level: {db_level:.2f} dBFS")
+        samples = np.array(audio.get_array_of_samples())
+        rms = np.sqrt(np.mean(samples**2))
+        db_level = 20 * math.log10(rms / (2**(8*audio.sample_width - 1))) if rms > 0 else -100
+        print("Calculated dB level:", db_level)
     except Exception as e:
         print("Error reading audio:", e)
-        db_level = -90
+        db_level = -100
 
-    # Adjusted thresholds
-    if db_level < -45:
-        emoji = "😢"  # very quiet
-    elif -45 <= db_level < -30:
-        emoji = "🙂"  # normal
-    elif -30 <= db_level < -15:
-        emoji = "😃"  # loud
+    # Emoji mapping
+    if db_level < -30:
+        return "😢"
+    elif -30 <= db_level < -10:
+        return "🙂"
+    elif -10 <= db_level < 0:
+        return "😃"
     else:
-        emoji = "🤯"  # very loud / clipping
-
-    print(f"Assigned emoji: {emoji}")
-    return emoji
+        return "🤯"
 
 class RecordingView(APIView):
     """
