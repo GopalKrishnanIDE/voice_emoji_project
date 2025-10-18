@@ -1,5 +1,8 @@
 import React, { useState, useRef } from "react";
 
+// Change this to your deployed backend URL
+const BACKEND_URL = "https://voice-emoji-project.onrender.com";
+
 function App() {
   const [emojis, setEmojis] = useState([]);
   const [recording, setRecording] = useState(false);
@@ -25,14 +28,14 @@ function App() {
       formData.append("audio_file", audioBlob);
 
       try {
-        const res = await fetch("https://voice-emoji-backend.onrender.com/api/recordings/", {
+        const res = await fetch(`${BACKEND_URL}/api/recordings/`, {
           method: "POST",
           body: formData,
         });
 
         const data = await res.json();
         if (data.emoji && data.audio_file) {
-          console.log('Sending the data from UI')
+          console.log("Sending the data from UI");
           setEmojis((prev) => [...prev, { emoji: data.emoji, audio_file: data.audio_file }]);
         }
       } catch (err) {
@@ -52,7 +55,7 @@ function App() {
       {emojis.map((item, i) => (
         <div key={i} style={{ marginTop: "1rem" }}>
           <span style={{ fontSize: "2rem" }}>{item.emoji}</span>
-          <audio controls src={`http://127.0.0.1:8000${item.audio_file}`}></audio>
+          <audio controls src={`${BACKEND_URL}${item.audio_file}`}></audio>
         </div>
       ))}
     </div>
@@ -60,3 +63,4 @@ function App() {
 }
 
 export default App;
+
