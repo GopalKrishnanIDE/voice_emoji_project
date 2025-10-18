@@ -4,25 +4,29 @@ from rest_framework import status
 from .models import Recording
 from .serializers import RecordingSerializer
 import wave
-from pydub import AudioSegment
-import audioop
+
+
 import math
+
+from pydub import AudioSegment
 import numpy as np
 
-
 def get_emoji_from_decibel(file_path):
+    """
+    Calculate approximate dB level and return an emoji.
+    Works without pyaudioop.
+    """
     try:
         audio = AudioSegment.from_file(file_path)
-        audio = audio.set_channels(1).set_frame_rate(44100)
         samples = np.array(audio.get_array_of_samples())
         rms = np.sqrt(np.mean(samples**2))
-        db_level = 20 * math.log10(rms / (2**(8*audio.sample_width - 1))) if rms > 0 else -100
+        db_level = 20 * np.log10(rms / (2**(8*audio.sample_width - 1))) if rms > 0 else -100
         print("Calculated dB level:", db_level)
     except Exception as e:
         print("Error reading audio:", e)
-        db_level = -100
+        db_level = -100  # fallback very quiet
 
-    # Emoji mapping
+    # Emoji assignment
     if db_level < -30:
         return "😢"
     elif -30 <= db_level < -10:
