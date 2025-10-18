@@ -26,11 +26,14 @@ SECRET_KEY = 'django-insecure-f42o14(cjjdyuv*wr0&pvgz_0m)*m&vrv-4k717a^8h6kckoqh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["voice-emoji-project.onrender.com"]
+ALLOWED_HOSTS = ["*"]
 
 
 
 # Application definition
+
+
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,15 +48,15 @@ INSTALLED_APPS = [
     'recordings',           # your own Django app
 ]
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 MIDDLEWARE = [
+      'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
      'corsheaders.middleware.CorsMiddleware',  # Add this at the very top
    
     
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+   
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,6 +67,10 @@ MIDDLEWARE = [
 
 
 ]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = 'backend.urls'
 

@@ -25,7 +25,7 @@ function App() {
       formData.append("audio_file", audioBlob);
 
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/recordings/", {
+        const res = await fetch("https://voice-emoji-backend.onrender.com/api/recordings/", {
           method: "POST",
           body: formData,
         });

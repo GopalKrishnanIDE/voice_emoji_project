@@ -1,9 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import home  # import the new view
+from django.http import JsonResponse
+
+def home(request):
+    return JsonResponse({"message": "Voice Emoji API is running!"})
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('recordings.urls')),
-    path('', home),  # root path
+    path("", home),
+    path("admin/", admin.site.urls),
+    path("api/", include("recordings.urls")),  # <-- critical
 ]
