@@ -3,18 +3,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Recording
 from .serializers import RecordingSerializer
-import wave
-
-
-import math
-
 from pydub import AudioSegment
 import numpy as np
+import os
 
 def get_emoji_from_decibel(file_path):
     """
     Calculate approximate dB level and return an emoji.
-    Works without pyaudioop.
+    Works without audioop/pyaudioop (Render-friendly).
     """
     try:
         audio = AudioSegment.from_file(file_path)
@@ -24,7 +20,7 @@ def get_emoji_from_decibel(file_path):
         print("Calculated dB level:", db_level)
     except Exception as e:
         print("Error reading audio:", e)
-        db_level = -100  # fallback very quiet
+        db_level = -100  # fallback
 
     # Emoji assignment
     if db_level < -30:
@@ -38,21 +34,20 @@ def get_emoji_from_decibel(file_path):
 
 class RecordingView(APIView):
     """
-    API view to handle recording uploads and assign emoji based on decibel.
+    API view to handle recording uploads and assign emoji.
     """
     def post(self, request):
         print('Recording under progress...')
         data = request.data.copy()
-
-        # Temporarily save uploaded file to calculate decibel
         audio_file = request.FILES.get('audio_file')
+
         if audio_file:
             temp_path = f"/tmp/{audio_file.name}"
             with open(temp_path, 'wb+') as temp_file:
                 for chunk in audio_file.chunks():
                     temp_file.write(chunk)
-            # Assign emoji based on decibel level
             data['emoji'] = get_emoji_from_decibel(temp_path)
+            os.remove(temp_path)
         else:
             data['emoji'] = "🙂"  # fallback
 
