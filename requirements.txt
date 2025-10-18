@@ -1,9 +1,7 @@
-Django==5.2.7
-djangorestframework==3.16.1
-django-cors-headers==4.9.0
-gunicorn==23.0.0
-whitenoise==6.11.0
-pydub==0.25.1
-numpy==1.25.2
-packaging==25.0
-sqlparse==0.5.3
+Django>=5.2,<6
+djangorestframework>=3.16
+gunicorn
+pydub
+whitenoise
+django-cors-headers
+numpy
